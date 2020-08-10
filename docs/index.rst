@@ -10,7 +10,7 @@ OMF Hint Filter
 
 The *fledge-filter-omfhint* filter allows hints to be added to assets within Fledge that will be used by the |OMFNorth| plugin. These hints allow for individual configuration of specific assets within the OMF plugin. 
 
-A OMF hint filter may be added to either a south service or a north task. In a south service it will be adding data for just those assets that originate in that service. In a north task it causes OMF hintss to be added to all assets that the Fledge is sending to the up stream system, it woudl normlly only be used in a north that was using the OMF plugin, however it could be used in a north that is sending data to another Fledge that then forwards to OMF.
+A OMF hint filter may be added to either a south service or a north task. In a south service it will be adding data for just those assets that originate in that service. In a north task it causes OMF hints to be added to all assets that the Fledge is sending to the up stream system, it would normally only be used in a north that was using the OMF plugin, however it could be used in a north that is sending data to another Fledge that then forwards to OMF.
 
 To add a OMF hints filter 
 
@@ -26,7 +26,7 @@ To add a OMF hints filter
 | |omfhint| |
 +-----------+
 
-  - Enter your OMF Hints in the JSON editor shown. You may add multiple hints for multiple assets in a signle filter instance. See `OMF Hint data`_
+  - Enter your OMF Hints in the JSON editor shown. You may add multiple hints for multiple assets in a single filter instance. See `OMF Hint data`_
 
   - Enable the filter and click on *Done* to activate it
 
@@ -42,10 +42,9 @@ The following hint types are currently supported by |OMFNorth|
 
   - *typeName*: Specify a particular type name that should be used by the plugin when it generates a type for the asset. The value of the hint is the name of the type to create.
 
-  - *tagName*: Specify a particular tag name that should be used by the plugin when it generates a tag for the as
-set. The value of the hint is the name of the tag to create.
+  - *tagName*: Specify a particular tag name that should be used by the plugin when it generates a tag for the asset. The value of the hint is the name of the tag to create.
 
-  - *type*: Specify a pre-existing type that should be used for the asset. In this case the value of the hint is the tyoe to use. The type must already exist within your PI Server and must be compatiblew with the values within the asset.
+  - *type*: Specify a pre-existing type that should be used for the asset. In this case the value of the hint is the type to use. The type must already exist within your PI Server and must be compatible with the values within the asset.
 
   - *datapoint*: Specifies that this hint applies to a single datapoint within the asset. The value is a JSON object that contains the name of the datapoint and one or more hints.
 
