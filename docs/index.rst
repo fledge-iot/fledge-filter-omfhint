@@ -38,7 +38,9 @@ OMF Hints that the for of an asset name to apply the hint to and a JSON document
 
 The following hint types are currently supported by |OMFNorth|
 
-  - *number*: The format to use for numbers, the value is a string and  may be any of the PI Server supported formats; float64, float32, float16, int64, int32m int16m uint64, uint32 or uint16
+  - *integer*: The format to use for integers, the value is a string and  may be any of the PI Server supported formats; int64, int32, int16, uint64, uint32 or uint16
+
+  - *number*: The format to use for numbers, the value is a string and  may be any of the PI Server supported formats; float64, float32 or float16
 
   - *typeName*: Specify a particular type name that should be used by the plugin when it generates a type for the asset. The value of the hint is the name of the type to create.
 
@@ -67,7 +69,7 @@ To apply a hint to a particular data point the hint would be as follows
         "datapoint" :
             {
                 "name": "frequency"
-                "number": "uint16"
+                "integer": "uint16"
             }
         }
   }
@@ -84,7 +86,7 @@ Datapoint hints can be combined with asset hints
         "datapoint" :
             {
                 "name": "frequency"
-                "number": "uint16"
+                "integer": "uint16"
             }
         }
   }
