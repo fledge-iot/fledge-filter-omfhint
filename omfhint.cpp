@@ -47,10 +47,6 @@ OMFHintFilter::OMFHintFilter(const std::string& filterName,
 void
 OMFHintFilter::ingest(vector<Reading *> *readings, vector<Reading *>& out)
 {
-	bool HintMatch;
-
-	HintMatch = false;
-
 	// Iterate thru' the readings
  	for (vector<Reading *>::const_iterator elem = readings->begin();
 			elem != readings->end(); ++elem)
@@ -60,7 +56,6 @@ OMFHintFilter::ingest(vector<Reading *> *readings, vector<Reading *>& out)
 
 		if (it != m_hints.end())
 		{
-			HintMatch = true;
 			DatapointValue value(it->second);
 			(*elem)->addDatapoint(new Datapoint("OMFHint", value));
 			AssetTracker::getAssetTracker()->addAssetTrackingTuple(m_name, name, string("Filter"));
@@ -80,7 +75,6 @@ OMFHintFilter::ingest(vector<Reading *> *readings, vector<Reading *>& out)
 				}
 			}
 		}
-
 		out.push_back(*elem);
 	}
 	readings->clear();
