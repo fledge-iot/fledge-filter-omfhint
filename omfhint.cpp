@@ -7,6 +7,7 @@
  *
  * Author: Mark Riddoch
  */
+#include <stdio.h>
 #include <reading.h>
 #include <reading_set.h>
 #include <utility>
@@ -16,6 +17,7 @@
 #include <rapidjson/writer.h>
 #include <omfhint.h>
 #include <string_utils.h>
+#include <string.h>
 
 using namespace std;
 using namespace rapidjson;
@@ -34,6 +36,8 @@ OMFHintFilter::OMFHintFilter(const std::string& filterName,
 	configure(filterConfig);
 }
 
+
+
 /**
  * Ingest data into the plugin and write the processed data to the out vector
  *
@@ -49,11 +53,27 @@ OMFHintFilter::ingest(vector<Reading *> *readings, vector<Reading *>& out)
 	{
 		string name = (*elem)->getAssetName();
 		auto it = m_hints.find(name);
+
 		if (it != m_hints.end())
 		{
 			DatapointValue value(it->second);
 			(*elem)->addDatapoint(new Datapoint("OMFHint", value));
 			AssetTracker::getAssetTracker()->addAssetTrackingTuple(m_name, name, string("Filter"));
+		} else {
+
+			if ( ! m_wildcards.empty() ) {
+
+				for(auto &item : m_wildcards) {
+
+					if (std::regex_match (name, item.first))
+					{
+						DatapointValue value(item.second);
+						(*elem)->addDatapoint(new Datapoint("OMFHint", value));
+						AssetTracker::getAssetTracker()->addAssetTrackingTuple(m_name, name, string("Filter"));
+						break;
+					}
+				}
+			}
 		}
 		out.push_back(*elem);
 	}
@@ -80,6 +100,8 @@ OMFHintFilter::configure(const ConfigCategory& config)
 	if (config.itemExists("hints"))
 	{
 		m_hints.clear();
+		m_wildcards.clear();
+
 		Document doc;
 		ParseResult result = doc.Parse(config.getValue("hints").c_str());
 		if (!result)
@@ -105,7 +127,13 @@ OMFHintFilter::configure(const ConfigCategory& config)
 					escaped.replace(pos, 1, replace);
 					pos = escaped.find("\"", pos+replace.size());
 				}
-				m_hints.insert(pair<string, string>(asset, escaped));
+
+				if (IsRegex(asset)) {
+
+					m_wildcards.push_back(std::pair<std::regex, std::string>(std::regex(asset), escaped));
+				} else {
+					m_hints.insert(pair<string, string>(asset, escaped));
+				}
 			}
 		}
 	}

@@ -12,6 +12,7 @@
 #include <config_category.h>
 #include <string>
 #include <map>
+#include <regex>
 
 class OMFHintFilter : public FledgeFilter {
 	public:
@@ -23,6 +24,7 @@ class OMFHintFilter : public FledgeFilter {
 		void	reconfigure(const std::string& newConfig);
 	private:
 		void	configure(const ConfigCategory& config);
-		std::map<std::string, std::string>
-				m_hints;
+
+		std::map<std::string, std::string>               m_hints;
+		std::vector<std::pair<std::regex, std::string>> m_wildcards;
 };
