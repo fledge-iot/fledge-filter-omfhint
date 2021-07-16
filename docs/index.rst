@@ -3,7 +3,7 @@
 
 .. |OMFNorth| raw:: html
 
-   <a href="../../fledge-north-OMF.html">OMF North</a>
+   <a href="../fledge-north-OMF/index.html">OMF North</a>
 
 OMF Hint Filter
 ===============
