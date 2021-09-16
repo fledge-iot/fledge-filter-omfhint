@@ -21,7 +21,7 @@
 
 #define FILTER_NAME "omfhint"
 
-const char *default_config = QUOTE({
+static const char *default_config = QUOTE({
 	"plugin" : {
 		"description" : "OMF Hint filter plugin, add OMF hints to one or more assets",
 		"type" : "string",
