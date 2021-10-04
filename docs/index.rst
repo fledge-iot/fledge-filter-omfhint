@@ -3,7 +3,7 @@
 
 .. |OMFNorth| raw:: html
 
-   <a href="../../fledge-north-OMF.html">OMF North</a>
+   <a href="../fledge-north-OMF/index.html">OMF North</a>
 
 OMF Hint Filter
 ===============
@@ -34,7 +34,9 @@ To add a OMF hints filter
 OMF Hint data
 -------------
 
-OMF Hints that the for of an asset name to apply the hint to and a JSON document that is the hint. A hint is a name/value pair, the name is the hint type and the value is the value of that hint.
+OMF Hints comprise of an asset name which the hint applies and a JSON document that is the hint. A hint is a name/value pair, the name is the hint type and the value is the value of that hint.
+
+The asset name may be expressed as a regular expression, in which case the hint is applied to all assets that match that regular expression.
 
 The following hint types are currently supported by |OMFNorth|
 
@@ -56,6 +58,26 @@ The following example shows a simple hint to set the number format to use for al
 
   {
     "supply": {
+        "number": "float32"
+        }
+  }
+
+To apply a hint to all assets, the single hint definition can be used with a regular expression.
+
+.. code-block:: JSON
+
+  {
+    ".*": {
+        "number": "float32"
+        }
+  }
+
+Regular expressions may also be used to select subsets of assets, in the following case only assets with the prefix OPCUA will have the hint applied.
+
+.. code-block:: JSON
+
+  {
+    "OPCUA.*": {
         "number": "float32"
         }
   }
