@@ -65,7 +65,7 @@ The following hint types are currently supported by |OMFNorth|:
 
   - *maximum*: Define the maximum value for a datapoint. This can only appear within datapoints and not for assets.
 
-  - *interpoaltion*: Define the interpolation value for a datapoint. This can only appear within datapoints and not for assets. Interpolation may be set to one of *continuous*, *discrete*, *stepwisecontinuousleading*, and *stepwisecontinuousfollowing*.
+  - *interpolation*: Define the interpolation value for a datapoint. This can only appear within datapoints and not for assets. Interpolation may be set to one of *continuous*, *discrete*, *stepwisecontinuousleading*, and *stepwisecontinuousfollowing*.
 
 The following example shows a simple hint to set the number format to use for all numeric data within the asset names *supply*.
 
@@ -146,7 +146,7 @@ datapoint item.
       }
    }
 
-The example above attaches a number hint to both the volatage and current
-datapoints and to the current datapoint it assigns a unit of measure
-of milliamepere, the unit of measure for the voltage is set to be volts.
+The example above attaches a number hint to both the voltage and current
+datapoints and to the current datapoint. It assigns a unit of measure
+of milliampere. The unit of measure for the voltage is set to be volts.
 
