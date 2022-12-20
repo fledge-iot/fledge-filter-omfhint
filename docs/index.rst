@@ -137,13 +137,21 @@ datapoint item.
 .. code-block:: JSON
 
    {
-      "motor4" : {
-        "OMFHint"  : { "datapoint" : [
-                { "name" : "voltage:, "number" : "float32", "uom" : "volt" },
-                { "name" : "current:, "number" : "uint32", "uom" : "milliampere }
-                ]
-        }
-      }
+   	"motor4": {
+   		"OMFHint": {
+   			"datapoint": [{
+   					"name": "voltage",
+   					"number": "float32",
+   					"uom": "volt"
+   				},
+   				{
+   					"name": "current",
+   					"number": "uint32",
+   					"uom": "milliampere"
+   				}
+   			]
+   		}
+   	}
    }
 
 The example above attaches a number hint to both the voltage and current
