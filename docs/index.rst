@@ -55,6 +55,18 @@ The following hint types are currently supported by |OMFNorth|:
   - *AFLocation*: Specifies a location in the OSIsoft Asset Framework for the asset.
     This hint is fully documented in the |OMFNorth| plugin page.
 
+  - *source*: Specifies the data source for the asset, the default data source is set to *Fledge*.
+
+  - *LegacyType*: This defines the way OMF types are used and provides a mechanism to use types in the way the initial OMF plugin used them. Unless you have reason to force this older behaviour it is recomended to not use this hint. This hint is fully documented in the |OMFNorth| plugin page.
+
+  - *uom*: Define the unit of mesaure for the datapoint. This can only appear within datapoints and not for assets.
+
+  - *minimum*: Define the minimum value for a datapoint. This can only appear within datapoints and not for assets.
+
+  - *maximum*: Define the maximum value for a datapoint. This can only appear within datapoints and not for assets.
+
+  - *interpolation*: Define the interpolation value for a datapoint. This can only appear within datapoints and not for assets. Interpolation may be set to one of *continuous*, *discrete*, *stepwisecontinuousleading*, and *stepwisecontinuousfollowing*.
+
 The following example shows a simple hint to set the number format to use for all numeric data within the asset names *supply*.
 
 .. code-block:: JSON
@@ -117,3 +129,32 @@ Datapoint hints can be combined with asset hints
   }
 
 In this case all numeric data except for *frequency* will be stored as float32 and *frequency* will be stored as uint16.
+
+If more than one datapoint within a reading is required to have OMF hints
+attached to them this may be done by using an array as a child of the
+datapoint item.
+
+.. code-block:: JSON
+
+   {
+   	"motor4": {
+   		"OMFHint": {
+   			"datapoint": [{
+   					"name": "voltage",
+   					"number": "float32",
+   					"uom": "volt"
+   				},
+   				{
+   					"name": "current",
+   					"number": "uint32",
+   					"uom": "milliampere"
+   				}
+   			]
+   		}
+   	}
+   }
+
+The example above attaches a number hint to both the voltage and current
+datapoints and to the current datapoint. It assigns a unit of measure
+of milliampere. The unit of measure for the voltage is set to be volts.
+
