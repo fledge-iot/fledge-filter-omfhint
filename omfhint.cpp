@@ -47,6 +47,8 @@ OMFHintFilter::OMFHintFilter(const std::string& filterName,
 void
 OMFHintFilter::ingest(vector<Reading *> *readings, vector<Reading *>& out)
 {
+	AssetTracker *instance =  nullptr;
+	instance =  AssetTracker::getAssetTracker();
 	// Iterate thru' the readings
  	for (vector<Reading *>::const_iterator elem = readings->begin();
 			elem != readings->end(); ++elem)
@@ -58,7 +60,10 @@ OMFHintFilter::ingest(vector<Reading *> *readings, vector<Reading *>& out)
 		{
 			DatapointValue value(it->second);
 			(*elem)->addDatapoint(new Datapoint("OMFHint", value));
-			AssetTracker::getAssetTracker()->addAssetTrackingTuple(m_name, name, string("Filter"));
+			if (instance != nullptr)
+			{
+				instance->addAssetTrackingTuple(m_name, name, string("Filter"));
+			}
 		} else {
 
 			if ( ! m_wildcards.empty() ) {
@@ -69,7 +74,10 @@ OMFHintFilter::ingest(vector<Reading *> *readings, vector<Reading *>& out)
 					{
 						DatapointValue value(item.second);
 						(*elem)->addDatapoint(new Datapoint("OMFHint", value));
-						AssetTracker::getAssetTracker()->addAssetTrackingTuple(m_name, name, string("Filter"));
+						if (instance != nullptr)
+						{
+							instance->addAssetTrackingTuple(m_name, name, string("Filter"));
+						}
 						break;
 					}
 				}
