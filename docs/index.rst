@@ -164,7 +164,7 @@ Macro substitution
 
 Simple macro substitution within the values of the hints based on the content of the reading can be done.
 
-Macro **$voltage_uom$** and **$current_uom$** will be replaced by the value of datapoint **voltage_uom** and **current_uom** respectively.
+Macro ```$voltage_uom$``` and ```$current_uom$``` will be replaced by the value of datapoint **voltage_uom** and **current_uom** respectively.
 
 .. code-block:: JSON
 
@@ -186,7 +186,7 @@ Macro **$voltage_uom$** and **$current_uom$** will be replaced by the value of d
    	}
    }
 
-Macro **$ASSET$** will be replaced by asset name. Other macros **$city$**, **$factory$** and **$floor$** will be replaced by the value of datapoint **city**, **factory** and **floor** respectively.
+Macro ```$ASSET$``` will be replaced by asset name. Other macros ```$city$```, ```$factory$``` and ```$floor$``` will be replaced by the value of datapoint **city**, **factory** and **floor** respectively.
 
 .. code-block:: JSON
 
