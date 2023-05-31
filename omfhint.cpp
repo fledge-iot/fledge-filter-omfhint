@@ -59,7 +59,7 @@ OMFHintFilter::ingest(vector<Reading *> *readings, vector<Reading *>& out)
 		if (it != m_hints.end())
 		{
 			std::string hintsJSON = it->second;
-			if (m_macro_dpName.size())
+			if (!m_macro_dpName.empty())
 				ReplaceMacros(*elem, hintsJSON);
 			DatapointValue value(hintsJSON);
 			(*elem)->addDatapoint(new Datapoint("OMFHint", value));
@@ -76,7 +76,7 @@ OMFHintFilter::ingest(vector<Reading *> *readings, vector<Reading *>& out)
 					if (std::regex_match (name, item.first))
 					{
 						std::string hintsJSON = item.second;
-						if (m_macro_dpName.size())
+						if (!m_macro_dpName.empty())
 							ReplaceMacros(*elem, hintsJSON);
 						DatapointValue value(hintsJSON);
 						(*elem)->addDatapoint(new Datapoint("OMFHint", value));
@@ -161,7 +161,7 @@ OMFHintFilter::configure(const ConfigCategory& config)
 }
 
 /**
- * Extract datapoint name for marco replacement
+ * Extract datapoint name for macro replacement
  *
  * @param hintsJson	OMFHints JSON
  */
