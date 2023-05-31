@@ -158,3 +158,43 @@ The example above attaches a number hint to both the voltage and current
 datapoints and to the current datapoint. It assigns a unit of measure
 of milliampere. The unit of measure for the voltage is set to be volts.
 
+
+Macro substitution
+------------------
+
+Simple macro substitution within the values of the hints based on the content of the reading can be done.
+
+Macro **$voltage_uom$** and **$current_uom$** will be replaced by the value of datapoint **voltage_uom** and **current_uom** respectively.
+
+.. code-block:: JSON
+
+   {
+   	"motor4": {
+   		"OMFHint": {
+   			"datapoint": [{
+   					"name": "voltage",
+   					"number": "float32",
+   					"uom": "$voltage_uom$"
+   				},
+   				{
+   					"name": "current",
+   					"number": "uint32",
+   					"uom": "$current_uom$"
+   				}
+   			]
+   		}
+   	}
+   }
+
+Macro **$ASSET$** will be replaced by asset name. Other macros **$city$**, **$factory$** and **$floor$** will be replaced by the value of datapoint **city**, **factory** and **floor** respectively.
+
+.. code-block:: JSON
+
+   {
+   	"motor4": {
+   		"OMFHint": {
+   			"AFLocation" : "/UK/$city$/$factory$/$floor$/$ASSET$"
+   		}
+   	}
+   }
+

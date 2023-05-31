@@ -58,7 +58,10 @@ OMFHintFilter::ingest(vector<Reading *> *readings, vector<Reading *>& out)
 
 		if (it != m_hints.end())
 		{
-			DatapointValue value(it->second);
+			std::string hintsJSON = it->second;
+			if (m_macro_dpName.size())
+				ReplaceMacros(*elem, hintsJSON);
+			DatapointValue value(hintsJSON);
 			(*elem)->addDatapoint(new Datapoint("OMFHint", value));
 			if (instance != nullptr)
 			{
@@ -72,7 +75,10 @@ OMFHintFilter::ingest(vector<Reading *> *readings, vector<Reading *>& out)
 
 					if (std::regex_match (name, item.first))
 					{
-						DatapointValue value(item.second);
+						std::string hintsJSON = item.second;
+						if (m_macro_dpName.size())
+							ReplaceMacros(*elem, hintsJSON);
+						DatapointValue value(hintsJSON);
 						(*elem)->addDatapoint(new Datapoint("OMFHint", value));
 						if (instance != nullptr)
 						{
@@ -107,6 +113,7 @@ OMFHintFilter::configure(const ConfigCategory& config)
 {
 	if (config.itemExists("hints"))
 	{
+		bool isMacro = false;
 		m_hints.clear();
 		m_wildcards.clear();
 
@@ -142,7 +149,66 @@ OMFHintFilter::configure(const ConfigCategory& config)
 				} else {
 					m_hints.insert(pair<string, string>(asset, escaped));
 				}
+				// Check if macro substituion is requried
+				// At least one pair of '$' sign must be there to apply macro
+				if (std::count(escaped.begin(), escaped.end(), '$') > 1)
+					isMacro = true;
 			}
 		}
+		if (isMacro)
+			collectMacrosInfo(config.getValue("hints"));
+	}
+}
+
+/**
+ * Extract datapoint name for marco replacement
+ *
+ * @param hintsJson	OMFHints JSON
+ */
+void OMFHintFilter::collectMacrosInfo(std::string hintsJSON)
+{
+	std::regex pattern("\\$([^$]*)\\$");
+	std::smatch match;
+
+	// Find and store all matching macros
+	while (std::regex_search(hintsJSON, match, pattern))
+	{
+		m_macro_dpName.emplace_back(match[1]);
+		hintsJSON = match.suffix();
+	}
+}
+
+/**
+ * Replace Macros with datapoint values
+ *
+ * @param reading	Reading
+ * @param hintsJson	OMFHints JSON
+ */
+void OMFHintFilter::ReplaceMacros(Reading *reading, std::string &hintsJSON)
+{
+	// Replace Macros by datapoint value
+	for ( auto dpName : m_macro_dpName)
+	{
+		if (dpName == "ASSET")
+		{
+			StringReplaceAll(hintsJSON, "$ASSET$", reading->getAssetName());
+			continue;
+		}
+		Datapoint * datapoint = reading->getDatapoint(dpName);
+
+		if (datapoint)
+		{
+			string datapointValue = datapoint->getData().toString();
+
+			// Strip quotes from begining and end
+			char quote = '"';
+			if (datapointValue.front() == quote && datapointValue.back() == quote)
+			{
+				datapointValue.erase(datapointValue.begin());
+				datapointValue.pop_back();
+			}
+			StringReplaceAll(hintsJSON, "$" + dpName + "$", datapointValue);
+		}
+
 	}
 }

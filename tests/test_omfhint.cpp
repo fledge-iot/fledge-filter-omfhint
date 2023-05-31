@@ -98,3 +98,143 @@ TEST(OMFHINT, OmfHintAddAssetDataPointHint)
     outdp = points[1];
     ASSERT_STREQ(outdp->getName().c_str(), "OMFHint");
 }
+
+TEST(OMFHINT, OmfHintDatapointMacro)
+{
+    const char *hintsJSON = R"({
+     "motor4": {
+             "OMFHint": {
+                     "datapoint": [{
+                                     "name": "voltage",
+                                     "number": "float32",
+                                     "uom": "$voltage_uom$"
+                             },
+                             {
+                                     "name": "current",
+                                     "number": "uint32",
+                                     "uom": "$current_uom$"
+                             }
+                     ]
+             }
+     }
+    })";
+
+    PLUGIN_INFORMATION *info = plugin_info();
+    ConfigCategory *config = new ConfigCategory("omfhint", info->config);
+    ASSERT_NE(config, (ConfigCategory *)NULL);
+    config->setItemsValueFromDefault();
+    ASSERT_EQ(config->itemExists("hints"), true);
+    ASSERT_EQ(config->itemExists("enable"), true);
+    config->setValue("hints", hintsJSON);
+    config->setValue("enable", "true");
+
+    ReadingSet *outReadings;
+    void *handle = plugin_init(config, &outReadings, Handler);
+    vector<Reading *> *readings = new vector<Reading *>;
+    vector<Datapoint *> dpValue;
+
+    long voltage = 25;
+    DatapointValue voltageDpv(voltage);
+    dpValue.push_back(new Datapoint("voltage", voltageDpv));
+
+    string voltage_uom = "Volt";
+    DatapointValue voltage_uomDpv(voltage_uom);
+    dpValue.push_back( new Datapoint("voltage_uom",voltage_uomDpv) );
+
+    long current = 12;
+    DatapointValue currentDpv(current);
+    dpValue.push_back(new Datapoint("current", currentDpv));
+
+    string current_uom = "Ampere";
+    DatapointValue current_uomDpv(current_uom);
+    dpValue.push_back( new Datapoint("current_uom",current_uomDpv) );
+
+    Reading *in = new Reading("motor4", dpValue);
+    readings->push_back(in);
+
+    ReadingSet *readingSet = new ReadingSet(readings);
+    plugin_ingest(handle, (READINGSET *)readingSet);
+
+    vector<Reading *> results = outReadings->getAllReadings();
+    ASSERT_EQ(results.size(), 1);
+    Reading *out = results[0];
+    ASSERT_EQ(out->getDatapointCount(), 5);
+
+    vector<Datapoint *> points = out->getReadingData();
+    ASSERT_EQ(points.size(), 5);
+
+    Datapoint *outdp = points[0];
+    ASSERT_STREQ(outdp->getName().c_str(), "voltage");
+
+    outdp = points[1];
+    ASSERT_STREQ(outdp->getName().c_str(), "voltage_uom");
+
+    outdp = points[2];
+    ASSERT_STREQ(outdp->getName().c_str(), "current");
+
+    outdp = points[3];
+    ASSERT_STREQ(outdp->getName().c_str(), "current_uom");
+
+    outdp = points[4];
+    ASSERT_STREQ(outdp->getName().c_str(),"OMFHint");
+    ASSERT_STREQ(outdp->getData().toString().c_str(), "\"{\\\"OMFHint\\\":{\\\"datapoint\\\":[{\\\"name\\\":\\\"voltage\\\",\\\"number\\\":\\\"float32\\\",\\\"uom\\\":\\\"Volt\\\"},{\\\"name\\\":\\\"current\\\",\\\"number\\\":\\\"uint32\\\",\\\"uom\\\":\\\"Ampere\\\"}]}}\"");
+}
+
+TEST(OMFHINT, OmfHintASSETMacro)
+{
+    const char *hintsJSON = R"({"Camera": {"OMFHint"  : { "AFLocation" : "/UK/$city$/$factory$/$floor$/$ASSET$" }}})";
+
+    PLUGIN_INFORMATION *info = plugin_info();
+    ConfigCategory *config = new ConfigCategory("omfhint", info->config);
+    ASSERT_NE(config, (ConfigCategory *)NULL);
+    config->setItemsValueFromDefault();
+    ASSERT_EQ(config->itemExists("hints"), true);
+    ASSERT_EQ(config->itemExists("enable"), true);
+    config->setValue("hints", hintsJSON);
+    config->setValue("enable", "true");
+
+    ReadingSet *outReadings;
+    void *handle = plugin_init(config, &outReadings, Handler);
+    vector<Reading *> *readings = new vector<Reading *>;
+    vector<Datapoint *> dpValue;
+
+    string city = "London";
+    DatapointValue cityDpv(city);
+    dpValue.push_back(new Datapoint("city", cityDpv));
+
+    string factory = "Plant1";
+    DatapointValue factoryDpv(factory);
+    dpValue.push_back( new Datapoint("factory",factoryDpv) );
+
+    long floor = 12;
+    DatapointValue floorDpv(floor);
+    dpValue.push_back(new Datapoint("floor", floorDpv));
+
+    Reading *in = new Reading("Camera", dpValue);
+    readings->push_back(in);
+
+    ReadingSet *readingSet = new ReadingSet(readings);
+    plugin_ingest(handle, (READINGSET *)readingSet);
+
+    vector<Reading *> results = outReadings->getAllReadings();
+    ASSERT_EQ(results.size(), 1);
+    Reading *out = results[0];
+    ASSERT_EQ(out->getDatapointCount(), 4);
+
+    vector<Datapoint *> points = out->getReadingData();
+    ASSERT_EQ(points.size(), 4);
+
+    Datapoint *outdp = points[0];
+    ASSERT_STREQ(outdp->getName().c_str(), "city");
+
+    outdp = points[1];
+    ASSERT_STREQ(outdp->getName().c_str(), "factory");
+
+    outdp = points[2];
+    ASSERT_STREQ(outdp->getName().c_str(), "floor");
+    ASSERT_STREQ(outdp->getData().toString().c_str(), "12");
+
+    outdp = points[3];
+    ASSERT_STREQ(outdp->getName().c_str(), "OMFHint");
+    ASSERT_STREQ(outdp->getData().toString().c_str(),  "\"{\\\"OMFHint\\\":{\\\"AFLocation\\\":\\\"/UK/London/Plant1/12/Camera\\\"}}\"");
+}
