@@ -189,6 +189,7 @@ void OMFHintFilter::ReplaceMacros(Reading *reading, std::string &hintsJSON)
 	// Replace Macros by datapoint value
 	for ( auto dpName : m_macro_dpName)
 	{
+		// In case of ASSET Macro, replace it by asset name instead of datapoint value
 		if (dpName == "ASSET")
 		{
 			StringReplaceAll(hintsJSON, "$ASSET$", reading->getAssetName());
@@ -198,6 +199,18 @@ void OMFHintFilter::ReplaceMacros(Reading *reading, std::string &hintsJSON)
 
 		if (datapoint)
 		{
+			// Check for datapoint type for string and numbers
+			DatapointValue::dataTagType dataType = datapoint->getData().getType();
+			if (
+				dataType != DatapointValue::dataTagType::T_STRING &&
+				dataType != DatapointValue::dataTagType::T_INTEGER &&
+				dataType != DatapointValue::dataTagType::T_FLOAT
+			)
+			{
+				Logger::getLogger()->warn("Only string and number are supported for macro");
+				continue;
+			}
+
 			string datapointValue = datapoint->getData().toString();
 
 			// Strip quotes from begining and end
@@ -209,6 +222,5 @@ void OMFHintFilter::ReplaceMacros(Reading *reading, std::string &hintsJSON)
 			}
 			StringReplaceAll(hintsJSON, "$" + dpName + "$", datapointValue);
 		}
-
 	}
 }
