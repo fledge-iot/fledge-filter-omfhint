@@ -149,7 +149,7 @@ OMFHintFilter::configure(const ConfigCategory& config)
 				} else {
 					m_hints.insert(pair<string, string>(asset, escaped));
 				}
-				// Check if macro substituion is requried
+				// Check if macro substituion is required
 				// At least one pair of '$' sign must be there to apply macro
 				if (std::count(escaped.begin(), escaped.end(), '$') > 1)
 					isMacro = true;
