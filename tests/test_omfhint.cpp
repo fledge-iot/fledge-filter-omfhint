@@ -354,6 +354,126 @@ TEST(OMFHINT, OmfHintPermutationMacro)
     ASSERT_STREQ(outdp->getData().toString().c_str(),  "\"{\\\"OMFHint\\\":{\\\"AFLocation\\\":\\\"/UK/NorthLondonPlant1South/A12B/Camera\\\"}}\"");
 }
 
+// Testing for unpaired $ sign
+TEST(OMFHINT, OmfHintPermutationMacro2)
+{
+    const char *hintsJSON = R"({"Camera": {"OMFHint"  : { "AFLocation" : "/UK/$city$$factory$/$floor$ASSET$" }}})";
+
+    PLUGIN_INFORMATION *info = plugin_info();
+    ConfigCategory *config = new ConfigCategory("omfhint", info->config);
+    ASSERT_NE(config, (ConfigCategory *)NULL);
+    config->setItemsValueFromDefault();
+    ASSERT_EQ(config->itemExists("hints"), true);
+    ASSERT_EQ(config->itemExists("enable"), true);
+    config->setValue("hints", hintsJSON);
+    config->setValue("enable", "true");
+
+    ReadingSet *outReadings;
+    void *handle = plugin_init(config, &outReadings, Handler);
+    vector<Reading *> *readings = new vector<Reading *>;
+    vector<Datapoint *> dpValue;
+
+    string city = "London";
+    DatapointValue cityDpv(city);
+    dpValue.push_back(new Datapoint("city", cityDpv));
+
+    string factory = "Plant1";
+    DatapointValue factoryDpv(factory);
+    dpValue.push_back( new Datapoint("factory",factoryDpv) );
+
+    long floor = 12;
+    DatapointValue floorDpv(floor);
+    dpValue.push_back(new Datapoint("floor", floorDpv));
+
+    Reading *in = new Reading("Camera", dpValue);
+    readings->push_back(in);
+
+    ReadingSet *readingSet = new ReadingSet(readings);
+    plugin_ingest(handle, (READINGSET *)readingSet);
+
+    vector<Reading *> results = outReadings->getAllReadings();
+    ASSERT_EQ(results.size(), 1);
+    Reading *out = results[0];
+    ASSERT_EQ(out->getDatapointCount(), 4);
+
+    vector<Datapoint *> points = out->getReadingData();
+    ASSERT_EQ(points.size(), 4);
+
+    Datapoint *outdp = points[0];
+    ASSERT_STREQ(outdp->getName().c_str(), "city");
+
+    outdp = points[1];
+    ASSERT_STREQ(outdp->getName().c_str(), "factory");
+
+    outdp = points[2];
+    ASSERT_STREQ(outdp->getName().c_str(), "floor");
+    ASSERT_STREQ(outdp->getData().toString().c_str(), "12");
+
+    outdp = points[3];
+    ASSERT_STREQ(outdp->getName().c_str(), "OMFHint");
+    ASSERT_STREQ(outdp->getData().toString().c_str(),  "\"{\\\"OMFHint\\\":{\\\"AFLocation\\\":\\\"/UK/LondonPlant1/12ASSET$\\\"}}\"");
+}
+
+// Testing for ASSET macro
+TEST(OMFHINT, OmfHintCaseSensitivityMacro)
+{
+    const char *hintsJSON = R"({"Camera": {"OMFHint"  : { "AFLocation" : "/UK/$city$/$Factory$/$Floor$/$ASSET$" }}})";
+
+    PLUGIN_INFORMATION *info = plugin_info();
+    ConfigCategory *config = new ConfigCategory("omfhint", info->config);
+    ASSERT_NE(config, (ConfigCategory *)NULL);
+    config->setItemsValueFromDefault();
+    ASSERT_EQ(config->itemExists("hints"), true);
+    ASSERT_EQ(config->itemExists("enable"), true);
+    config->setValue("hints", hintsJSON);
+    config->setValue("enable", "true");
+
+    ReadingSet *outReadings;
+    void *handle = plugin_init(config, &outReadings, Handler);
+    vector<Reading *> *readings = new vector<Reading *>;
+    vector<Datapoint *> dpValue;
+
+    string city = "London";
+    DatapointValue cityDpv(city);
+    dpValue.push_back(new Datapoint("city", cityDpv));
+
+    string factory = "Plant1";
+    DatapointValue factoryDpv(factory);
+    dpValue.push_back( new Datapoint("factory",factoryDpv) );
+
+    long floor = 12;
+    DatapointValue floorDpv(floor);
+    dpValue.push_back(new Datapoint("floor", floorDpv));
+
+    Reading *in = new Reading("Camera", dpValue);
+    readings->push_back(in);
+
+    ReadingSet *readingSet = new ReadingSet(readings);
+    plugin_ingest(handle, (READINGSET *)readingSet);
+
+    vector<Reading *> results = outReadings->getAllReadings();
+    ASSERT_EQ(results.size(), 1);
+    Reading *out = results[0];
+    ASSERT_EQ(out->getDatapointCount(), 4);
+
+    vector<Datapoint *> points = out->getReadingData();
+    ASSERT_EQ(points.size(), 4);
+
+    Datapoint *outdp = points[0];
+    ASSERT_STREQ(outdp->getName().c_str(), "city");
+
+    outdp = points[1];
+    ASSERT_STREQ(outdp->getName().c_str(), "factory");
+
+    outdp = points[2];
+    ASSERT_STREQ(outdp->getName().c_str(), "floor");
+    ASSERT_STREQ(outdp->getData().toString().c_str(), "12");
+
+    outdp = points[3];
+    ASSERT_STREQ(outdp->getName().c_str(), "OMFHint");
+    ASSERT_STREQ(outdp->getData().toString().c_str(),  "\"{\\\"OMFHint\\\":{\\\"AFLocation\\\":\\\"/UK/London/$Factory$/$Floor$/Camera\\\"}}\"");
+}
+
 // Testing macro for unsupported datatype for city datapoint
 TEST(OMFHINT, OmfHintUnspportedMacro)
 {
