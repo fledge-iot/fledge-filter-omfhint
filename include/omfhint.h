@@ -28,6 +28,6 @@ class OMFHintFilter : public FledgeFilter {
 		void	ReplaceMacros(Reading * reading, std::string& hintsJSON);
 
 		std::map<std::string, std::string>               m_hints;
+		std::vector<std::pair<std::string, int>>         m_macro_dp;
 		std::vector<std::pair<std::regex, std::string>> m_wildcards;
-		std::vector<std::string> m_macro_dpName;
 };

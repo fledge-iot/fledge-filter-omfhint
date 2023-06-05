@@ -192,9 +192,7 @@ Macro ``$ASSET$`` will be replaced by asset name. Other macros ``$city$``, ``$fa
 
    {
    	"motor4": {
-   		"OMFHint": {
    			"AFLocation" : "/UK/$city$/$factory$/$floor$/$ASSET$"
-   		}
    	}
    }
 

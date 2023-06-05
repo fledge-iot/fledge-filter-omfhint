@@ -94,7 +94,7 @@ TEST(OMFHINT, OmfHintAddAssetDataPointHint)
 
     Datapoint *outdp = points[0];
     ASSERT_STREQ(outdp->getName().c_str(), "test");
-
+    
     outdp = points[1];
     ASSERT_STREQ(outdp->getName().c_str(), "OMFHint");
 }
@@ -183,7 +183,7 @@ TEST(OMFHINT, OmfHintDatapointMacro)
 // Testing for ASSET macro
 TEST(OMFHINT, OmfHintASSETMacro)
 {
-    const char *hintsJSON = R"({"Camera": {"OMFHint"  : { "AFLocation" : "/UK/$city$/$factory$/$floor$/$ASSET$" }}})";
+    const char *hintsJSON = R"({"Camera": {"AFLocation" : "/UK/$city$/$factory$/$floor$/$ASSET$" }})";
 
     PLUGIN_INFORMATION *info = plugin_info();
     ConfigCategory *config = new ConfigCategory("omfhint", info->config);
@@ -237,13 +237,13 @@ TEST(OMFHINT, OmfHintASSETMacro)
 
     outdp = points[3];
     ASSERT_STREQ(outdp->getName().c_str(), "OMFHint");
-    ASSERT_STREQ(outdp->getData().toString().c_str(),  "\"{\\\"OMFHint\\\":{\\\"AFLocation\\\":\\\"/UK/London/Plant1/12/Camera\\\"}}\"");
+    ASSERT_STREQ(outdp->getData().toString().c_str(),   "\"{\\\"AFLocation\\\":\\\"/UK/London/Plant1/12/Camera\\\"}\"");
 }
 
 // Testing for missing datapoint city
 TEST(OMFHINT, OmfHintASSETMacroMissingDataPoints)
 {
-    const char *hintsJSON = R"({"Camera": {"OMFHint"  : { "AFLocation" : "/UK/$city$/$factory$/$floor$/$ASSET$" }}})";
+    const char *hintsJSON = R"({"Camera": {"AFLocation" : "/UK/$city$/$factory$/$floor$/$ASSET$" }})";
 
     PLUGIN_INFORMATION *info = plugin_info();
     ConfigCategory *config = new ConfigCategory("omfhint", info->config);
@@ -290,14 +290,14 @@ TEST(OMFHINT, OmfHintASSETMacroMissingDataPoints)
     outdp = points[2];
     ASSERT_STREQ(outdp->getName().c_str(), "OMFHint");
     // Except missing datapoint city other macros have repalced.
-    ASSERT_STREQ(outdp->getData().toString().c_str(),  "\"{\\\"OMFHint\\\":{\\\"AFLocation\\\":\\\"/UK/$city$/Plant1/12/Camera\\\"}}\"");
+    ASSERT_STREQ(outdp->getData().toString().c_str(),  "\"{\\\"AFLocation\\\":\\\"/UK/$city$/Plant1/12/Camera\\\"}\"");
 }
 
 
 // Testing for differnet permutations for macro
 TEST(OMFHINT, OmfHintPermutationMacro)
 {
-    const char *hintsJSON = R"({"Camera": {"OMFHint"  : { "AFLocation" : "/UK/North$city$$factory$South/A$floor$B/$ASSET$" }}})";
+    const char *hintsJSON = R"({"Camera": {"AFLocation" : "/UK/North$city$$factory$South/A$floor$B/$ASSET$" }})";
 
     PLUGIN_INFORMATION *info = plugin_info();
     ConfigCategory *config = new ConfigCategory("omfhint", info->config);
@@ -351,13 +351,13 @@ TEST(OMFHINT, OmfHintPermutationMacro)
 
     outdp = points[3];
     ASSERT_STREQ(outdp->getName().c_str(), "OMFHint");
-    ASSERT_STREQ(outdp->getData().toString().c_str(),  "\"{\\\"OMFHint\\\":{\\\"AFLocation\\\":\\\"/UK/NorthLondonPlant1South/A12B/Camera\\\"}}\"");
+    ASSERT_STREQ(outdp->getData().toString().c_str(),  "\"{\\\"AFLocation\\\":\\\"/UK/NorthLondonPlant1South/A12B/Camera\\\"}\"");
 }
 
 // Testing for unpaired $ sign
 TEST(OMFHINT, OmfHintPermutationMacro2)
 {
-    const char *hintsJSON = R"({"Camera": {"OMFHint"  : { "AFLocation" : "/UK/$city$$factory$/$floor$ASSET$" }}})";
+    const char *hintsJSON = R"({"Camera": {"AFLocation" : "/UK/$city$$factory$/$floor$ASSET$" }})";
 
     PLUGIN_INFORMATION *info = plugin_info();
     ConfigCategory *config = new ConfigCategory("omfhint", info->config);
@@ -411,13 +411,13 @@ TEST(OMFHINT, OmfHintPermutationMacro2)
 
     outdp = points[3];
     ASSERT_STREQ(outdp->getName().c_str(), "OMFHint");
-    ASSERT_STREQ(outdp->getData().toString().c_str(),  "\"{\\\"OMFHint\\\":{\\\"AFLocation\\\":\\\"/UK/LondonPlant1/12ASSET$\\\"}}\"");
+    ASSERT_STREQ(outdp->getData().toString().c_str(),  "\"{\\\"AFLocation\\\":\\\"/UK/LondonPlant1/12ASSET$\\\"}\"");
 }
 
 // Testing for ASSET macro
 TEST(OMFHINT, OmfHintCaseSensitivityMacro)
 {
-    const char *hintsJSON = R"({"Camera": {"OMFHint"  : { "AFLocation" : "/UK/$city$/$Factory$/$Floor$/$ASSET$" }}})";
+    const char *hintsJSON = R"({"Camera": {"AFLocation" : "/UK/$city$/$Factory$/$Floor$/$ASSET$" }})";
 
     PLUGIN_INFORMATION *info = plugin_info();
     ConfigCategory *config = new ConfigCategory("omfhint", info->config);
@@ -471,13 +471,13 @@ TEST(OMFHINT, OmfHintCaseSensitivityMacro)
 
     outdp = points[3];
     ASSERT_STREQ(outdp->getName().c_str(), "OMFHint");
-    ASSERT_STREQ(outdp->getData().toString().c_str(),  "\"{\\\"OMFHint\\\":{\\\"AFLocation\\\":\\\"/UK/London/$Factory$/$Floor$/Camera\\\"}}\"");
+    ASSERT_STREQ(outdp->getData().toString().c_str(),  "\"{\\\"AFLocation\\\":\\\"/UK/London/$Factory$/$Floor$/Camera\\\"}\"");
 }
 
 // Testing macro for unsupported datatype for city datapoint
 TEST(OMFHINT, OmfHintUnspportedMacro)
 {
-    const char *hintsJSON = R"({"Camera": {"OMFHint"  : { "AFLocation" : "/UK/$city$/$factory$/$floor$/$ASSET$" }}})";
+    const char *hintsJSON = R"({"Camera": {"AFLocation" : "/UK/$city$/$factory$/$floor$/$ASSET$" }})";
 
     PLUGIN_INFORMATION *info = plugin_info();
     ConfigCategory *config = new ConfigCategory("omfhint", info->config);
@@ -535,5 +535,5 @@ TEST(OMFHINT, OmfHintUnspportedMacro)
     outdp = points[3];
     ASSERT_STREQ(outdp->getName().c_str(), "OMFHint");
     // Except unsupported datapoint city of image type other macros have been repalced.
-    ASSERT_STREQ(outdp->getData().toString().c_str(),  "\"{\\\"OMFHint\\\":{\\\"AFLocation\\\":\\\"/UK/$city$/Plant1/12/Camera\\\"}}\"");
+    ASSERT_STREQ(outdp->getData().toString().c_str(),  "\"{\\\"AFLocation\\\":\\\"/UK/$city$/Plant1/12/Camera\\\"}\"");
 }

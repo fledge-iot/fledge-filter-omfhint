@@ -59,7 +59,7 @@ OMFHintFilter::ingest(vector<Reading *> *readings, vector<Reading *>& out)
 		if (it != m_hints.end())
 		{
 			std::string hintsJSON = it->second;
-			if (!m_macro_dpName.empty())
+			if (!m_macro_dp.empty())
 				ReplaceMacros(*elem, hintsJSON);
 			DatapointValue value(hintsJSON);
 			(*elem)->addDatapoint(new Datapoint("OMFHint", value));
@@ -76,7 +76,7 @@ OMFHintFilter::ingest(vector<Reading *> *readings, vector<Reading *>& out)
 					if (std::regex_match (name, item.first))
 					{
 						std::string hintsJSON = item.second;
-						if (!m_macro_dpName.empty())
+						if (!m_macro_dp.empty())
 							ReplaceMacros(*elem, hintsJSON);
 						DatapointValue value(hintsJSON);
 						(*elem)->addDatapoint(new Datapoint("OMFHint", value));
@@ -113,7 +113,6 @@ OMFHintFilter::configure(const ConfigCategory& config)
 {
 	if (config.itemExists("hints"))
 	{
-		bool isMacro = false;
 		m_hints.clear();
 		m_wildcards.clear();
 
@@ -152,11 +151,10 @@ OMFHintFilter::configure(const ConfigCategory& config)
 				// Check if macro substituion is required
 				// At least one pair of '$' sign must be there to apply macro
 				if (std::count(escaped.begin(), escaped.end(), '$') > 1)
-					isMacro = true;
+					collectMacrosInfo(escaped.c_str());
 			}
 		}
-		if (isMacro)
-			collectMacrosInfo(config.getValue("hints"));
+	
 	}
 }
 
@@ -167,14 +165,17 @@ OMFHintFilter::configure(const ConfigCategory& config)
  */
 void OMFHintFilter::collectMacrosInfo(std::string hintsJSON)
 {
-	std::regex pattern("\\$([^$]*)\\$");
-	std::smatch match;
+	std::string::size_type start = hintsJSON.find('$');
+	std::string::size_type end = hintsJSON.find('$', start + 1);
 
-	// Find and store all matching macros
-	while (std::regex_search(hintsJSON, match, pattern))
+	while (start != std::string::npos && end != std::string::npos) 
 	{
-		m_macro_dpName.emplace_back(match[1]);
-		hintsJSON = match.suffix();
+		if (end > start + 1) 
+		{
+			m_macro_dp.emplace_back(std::make_pair( hintsJSON.substr(start + 1, end - start - 1), start));
+		}
+		start = hintsJSON.find('$', end + 1);
+		end = hintsJSON.find('$', start + 1);
 	}
 }
 
@@ -187,15 +188,15 @@ void OMFHintFilter::collectMacrosInfo(std::string hintsJSON)
 void OMFHintFilter::ReplaceMacros(Reading *reading, std::string &hintsJSON)
 {
 	// Replace Macros by datapoint value
-	for ( auto dpName : m_macro_dpName)
+	for (auto it =  m_macro_dp.rbegin(); it != m_macro_dp.rend(); ++it)
 	{
 		// In case of ASSET Macro, replace it by asset name instead of datapoint value
-		if (dpName == "ASSET")
+		if ((*it).first == "ASSET")
 		{
-			StringReplaceAll(hintsJSON, "$ASSET$", reading->getAssetName());
+			hintsJSON.replace((*it).second, (*it).first.length()+2, reading->getAssetName() );
 			continue;
 		}
-		Datapoint * datapoint = reading->getDatapoint(dpName);
+		Datapoint * datapoint = reading->getDatapoint((*it).first);
 
 		if (datapoint)
 		{
@@ -207,20 +208,23 @@ void OMFHintFilter::ReplaceMacros(Reading *reading, std::string &hintsJSON)
 				dataType != DatapointValue::dataTagType::T_FLOAT
 			)
 			{
-				Logger::getLogger()->warn("Only string and number are supported for macro");
+				Logger::getLogger()->warn("The datapoint %s can not be used as a macro substitution in the OMF Hint as it is not a string or numeric value",(*it).first.c_str());
 				continue;
 			}
-
-			string datapointValue = datapoint->getData().toString();
-
-			// Strip quotes from begining and end
-			char quote = '"';
-			if (datapointValue.front() == quote && datapointValue.back() == quote)
+			string datapointValue = "";
+			switch (dataType)
 			{
-				datapointValue.erase(datapointValue.begin());
-				datapointValue.pop_back();
+				case DatapointValue::dataTagType::T_INTEGER: 
+					datapointValue = std::to_string(datapoint->getData().toInt());
+					break;
+				case DatapointValue::dataTagType::T_FLOAT: 
+					datapointValue = std::to_string(datapoint->getData().toDouble());
+					break;
+				default: 
+				datapointValue = datapoint->getData().toStringValue();
+				break;
 			}
-			StringReplaceAll(hintsJSON, "$" + dpName + "$", datapointValue);
+			hintsJSON.replace((*it).second, (*it).first.length()+2, datapointValue );
 		}
 	}
 }
