@@ -289,12 +289,12 @@ TEST(OMFHINT, OmfHintASSETMacroMissingDataPoints)
 
     outdp = points[2];
     ASSERT_STREQ(outdp->getName().c_str(), "OMFHint");
-    // Except missing datapoint city other macros have repalced.
+    // Except missing datapoint city other macros have been replaced.
     ASSERT_STREQ(outdp->getData().toString().c_str(),  "\"{\\\"AFLocation\\\":\\\"/UK/$city$/Plant1/12/Camera\\\"}\"");
 }
 
 
-// Testing for differnet permutations for macro
+// Testing for different permutations for macro
 TEST(OMFHINT, OmfHintPermutationMacro)
 {
     const char *hintsJSON = R"({"Camera": {"AFLocation" : "/UK/North$city$$factory$South/A$floor$B/$ASSET$" }})";
@@ -493,7 +493,7 @@ TEST(OMFHINT, OmfHintUnspportedMacro)
     vector<Reading *> *readings = new vector<Reading *>;
     vector<Datapoint *> dpValue;
 
-    //unspported DatapointValue::dataTagType::T_IMAGE datatype
+    //unsupported DatapointValue::dataTagType::T_IMAGE datatype
     void *data = malloc(100 * 100);
     DPImage *cityImage = new DPImage(100, 100, 8, data);
     
@@ -534,6 +534,6 @@ TEST(OMFHINT, OmfHintUnspportedMacro)
 
     outdp = points[3];
     ASSERT_STREQ(outdp->getName().c_str(), "OMFHint");
-    // Except unsupported datapoint city of image type other macros have been repalced.
+    // Except unsupported datapoint city of image type other macros have been replaced.
     ASSERT_STREQ(outdp->getData().toString().c_str(),  "\"{\\\"AFLocation\\\":\\\"/UK/$city$/Plant1/12/Camera\\\"}\"");
 }

@@ -148,7 +148,7 @@ OMFHintFilter::configure(const ConfigCategory& config)
 				} else {
 					m_hints.insert(pair<string, string>(asset, escaped));
 				}
-				// Check if macro substituion is required
+				// Check if macro substitution is required
 				// At least one pair of '$' sign must be there to apply macro
 				if (std::count(escaped.begin(), escaped.end(), '$') > 1)
 					collectMacrosInfo(escaped.c_str());
@@ -208,7 +208,7 @@ void OMFHintFilter::ReplaceMacros(Reading *reading, std::string &hintsJSON)
 				dataType != DatapointValue::dataTagType::T_FLOAT
 			)
 			{
-				Logger::getLogger()->warn("The datapoint %s can not be used as a macro substitution in the OMF Hint as it is not a string or numeric value",(*it).first.c_str());
+				Logger::getLogger()->warn("The datapoint %s cannot be used as a macro substitution in the OMF Hint as it is not a string or numeric value",(*it).first.c_str());
 				continue;
 			}
 			string datapointValue = "";
