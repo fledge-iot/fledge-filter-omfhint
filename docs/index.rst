@@ -138,7 +138,6 @@ datapoint item.
 
    {
    	"motor4": {
-   		"OMFHint": {
    			"datapoint": [{
    					"name": "voltage",
    					"number": "float32",
@@ -150,7 +149,6 @@ datapoint item.
    					"uom": "milliampere"
    				}
    			]
-   		}
    	}
    }
 
@@ -170,7 +168,6 @@ Macro ``$voltage_uom$`` and ``$current_uom$`` will be replaced by the value of d
 
    {
    	"motor4": {
-   		"OMFHint": {
    			"datapoint": [{
    					"name": "voltage",
    					"number": "float32",
@@ -182,7 +179,6 @@ Macro ``$voltage_uom$`` and ``$current_uom$`` will be replaced by the value of d
    					"uom": "$current_uom$"
    				}
    			]
-   		}
    	}
    }
 

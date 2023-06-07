@@ -103,19 +103,17 @@ TEST(OMFHINT, OmfHintDatapointMacro)
 {
     const char *hintsJSON = R"({
      "motor4": {
-             "OMFHint": {
-                     "datapoint": [{
-                                     "name": "voltage",
-                                     "number": "float32",
-                                     "uom": "$voltage_uom$"
-                             },
-                             {
-                                     "name": "current",
-                                     "number": "uint32",
-                                     "uom": "$current_uom$"
-                             }
-                     ]
-             }
+                "datapoint": [{
+                                "name": "voltage",
+                                "number": "float32",
+                                "uom": "$voltage_uom$"
+                        },
+                        {
+                                "name": "current",
+                                "number": "uint32",
+                                "uom": "$current_uom$"
+                        }
+                ]
      }
     })";
 
@@ -177,7 +175,7 @@ TEST(OMFHINT, OmfHintDatapointMacro)
 
     outdp = points[4];
     ASSERT_STREQ(outdp->getName().c_str(),"OMFHint");
-    ASSERT_STREQ(outdp->getData().toString().c_str(), "\"{\\\"OMFHint\\\":{\\\"datapoint\\\":[{\\\"name\\\":\\\"voltage\\\",\\\"number\\\":\\\"float32\\\",\\\"uom\\\":\\\"Volt\\\"},{\\\"name\\\":\\\"current\\\",\\\"number\\\":\\\"uint32\\\",\\\"uom\\\":\\\"Ampere\\\"}]}}\"");
+    ASSERT_STREQ(outdp->getData().toString().c_str(), "\"{\\\"datapoint\\\":[{\\\"name\\\":\\\"voltage\\\",\\\"number\\\":\\\"float32\\\",\\\"uom\\\":\\\"Volt\\\"},{\\\"name\\\":\\\"current\\\",\\\"number\\\":\\\"uint32\\\",\\\"uom\\\":\\\"Ampere\\\"}]}\"");
 }
 
 // Testing for ASSET macro
