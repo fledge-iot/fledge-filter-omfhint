@@ -58,7 +58,10 @@ OMFHintFilter::ingest(vector<Reading *> *readings, vector<Reading *>& out)
 
 		if (it != m_hints.end())
 		{
-			DatapointValue value(it->second);
+			std::string hintsJSON = it->second;
+			if (!m_macro_dp.empty())
+				ReplaceMacros(*elem, hintsJSON);
+			DatapointValue value(hintsJSON);
 			(*elem)->addDatapoint(new Datapoint("OMFHint", value));
 			if (instance != nullptr)
 			{
@@ -72,7 +75,10 @@ OMFHintFilter::ingest(vector<Reading *> *readings, vector<Reading *>& out)
 
 					if (std::regex_match (name, item.first))
 					{
-						DatapointValue value(item.second);
+						std::string hintsJSON = item.second;
+						if (!m_macro_dp.empty())
+							ReplaceMacros(*elem, hintsJSON);
+						DatapointValue value(hintsJSON);
 						(*elem)->addDatapoint(new Datapoint("OMFHint", value));
 						if (instance != nullptr)
 						{
@@ -142,7 +148,83 @@ OMFHintFilter::configure(const ConfigCategory& config)
 				} else {
 					m_hints.insert(pair<string, string>(asset, escaped));
 				}
+				// Check if macro substitution is required
+				// At least one pair of '$' sign must be there to apply macro
+				if (std::count(escaped.begin(), escaped.end(), '$') > 1)
+					collectMacrosInfo(escaped.c_str());
 			}
+		}
+	
+	}
+}
+
+/**
+ * Extract datapoint name for macro replacement
+ *
+ * @param hintsJson	OMFHints JSON
+ */
+void OMFHintFilter::collectMacrosInfo(std::string hintsJSON)
+{
+	std::string::size_type start = hintsJSON.find('$');
+	std::string::size_type end = hintsJSON.find('$', start + 1);
+
+	while (start != std::string::npos && end != std::string::npos) 
+	{
+		if (end > start + 1) 
+		{
+			m_macro_dp.emplace_back(std::make_pair( hintsJSON.substr(start + 1, end - start - 1), start));
+		}
+		start = hintsJSON.find('$', end + 1);
+		end = hintsJSON.find('$', start + 1);
+	}
+}
+
+/**
+ * Replace Macros with datapoint values
+ *
+ * @param reading	Reading
+ * @param hintsJson	OMFHints JSON
+ */
+void OMFHintFilter::ReplaceMacros(Reading *reading, std::string &hintsJSON)
+{
+	// Replace Macros by datapoint value
+	for (auto it =  m_macro_dp.rbegin(); it != m_macro_dp.rend(); ++it)
+	{
+		// In case of ASSET Macro, replace it by asset name instead of datapoint value
+		if ((*it).first == "ASSET")
+		{
+			hintsJSON.replace((*it).second, (*it).first.length()+2, reading->getAssetName() );
+			continue;
+		}
+		Datapoint * datapoint = reading->getDatapoint((*it).first);
+
+		if (datapoint)
+		{
+			// Check for datapoint type for string and numbers
+			DatapointValue::dataTagType dataType = datapoint->getData().getType();
+			if (
+				dataType != DatapointValue::dataTagType::T_STRING &&
+				dataType != DatapointValue::dataTagType::T_INTEGER &&
+				dataType != DatapointValue::dataTagType::T_FLOAT
+			)
+			{
+				Logger::getLogger()->warn("The datapoint %s cannot be used as a macro substitution in the OMF Hint as it is not a string or numeric value",(*it).first.c_str());
+				continue;
+			}
+			string datapointValue = "";
+			switch (dataType)
+			{
+				case DatapointValue::dataTagType::T_INTEGER: 
+					datapointValue = std::to_string(datapoint->getData().toInt());
+					break;
+				case DatapointValue::dataTagType::T_FLOAT: 
+					datapointValue = std::to_string(datapoint->getData().toDouble());
+					break;
+				default: 
+				datapointValue = datapoint->getData().toStringValue();
+				break;
+			}
+			hintsJSON.replace((*it).second, (*it).first.length()+2, datapointValue );
 		}
 	}
 }
