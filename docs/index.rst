@@ -40,9 +40,9 @@ The asset name may be expressed as a regular expression, in which case the hint 
 
 The following hint types are currently supported by |OMFNorth|:
 
-  - *integer*: The format to use for integers, the value is a string and  may be any of the PI Server supported formats; int64, int32, int16, uint64, uint32 or uint16
+  - *integer*: The format to use for integers, the value is a string and may be any of the PI Server supported formats; int64, int32, int16, uint64, uint32 or uint16
 
-  - *number*: The format to use for numbers, the value is a string and  may be any of the PI Server supported formats; float64, float32 or float16
+  - *number*: The format to use for numbers, the value is a string and may be any of the PI Server supported formats; float64, float32 or float16
 
   - *typeName*: Specify a particular type name that should be used by the plugin when it generates a type for the asset. The value of the hint is the name of the type to create.
 
@@ -57,9 +57,7 @@ The following hint types are currently supported by |OMFNorth|:
 
   - *source*: Specifies the data source for the asset, the default data source is set to *Fledge*.
 
-  - *LegacyType*: This defines the way OMF types are used and provides a mechanism to use types in the way the initial OMF plugin used them. Unless you have reason to force this older behaviour it is recomended to not use this hint. This hint is fully documented in the |OMFNorth| plugin page.
-
-  - *uom*: Define the unit of mesaure for the datapoint. This can only appear within datapoints and not for assets.
+  - *uom*: Define the unit of measure for the datapoint. This can only appear within datapoints and not for assets.
 
   - *minimum*: Define the minimum value for a datapoint. This can only appear within datapoints and not for assets.
 
