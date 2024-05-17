@@ -142,10 +142,17 @@ OMFHintFilter::configure(const ConfigCategory& config)
 					pos = escaped.find("\"", pos+replace.size());
 				}
 
-				if (IsRegex(asset)) {
-
-					m_wildcards.push_back(std::pair<std::regex, std::string>(std::regex(asset), escaped));
-				} else {
+				if (IsRegex(asset))
+				{
+					try {
+						m_wildcards.push_back(std::pair<std::regex, std::string>(std::regex(asset), escaped));
+					} catch (const std::regex_error& e) {
+						Logger::getLogger()->warn("Asset name %s in OMF hint is not a valid regular expression, it will be treated as a literal asset name.", asset.c_str());
+						m_hints.insert(pair<string, string>(asset, escaped));
+					}
+				}
+				else
+				{
 					m_hints.insert(pair<string, string>(asset, escaped));
 				}
 				// Check if macro substitution is required
