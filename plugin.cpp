@@ -121,7 +121,6 @@ void plugin_ingest(PLUGIN_HANDLE *handle,
 		delete (ReadingSet *)readingSet;
 
 		ReadingSet *newReadingSet = new ReadingSet(&out);
-		const vector<Reading *>& readings = newReadingSet->getAllReadings();
 		omfhint->m_func(omfhint->m_data, newReadingSet);
 	}
 }
