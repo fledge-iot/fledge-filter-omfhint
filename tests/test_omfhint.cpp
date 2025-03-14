@@ -20,6 +20,7 @@ extern "C"
     PLUGIN_HANDLE plugin_init(ConfigCategory *config,
                               OUTPUT_HANDLE *outHandle,
                               OUTPUT_STREAM output);
+    void plugin_shutdown(PLUGIN_HANDLE handle);
     int called = 0;
 
     void Handler(void *handle, READINGSET *readings)
@@ -50,6 +51,8 @@ TEST(OMFHINT, OmfHintDisabled)
     readings->push_back(in);
 
     ReadingSet *readingSet = new ReadingSet(readings);
+    readings->clear();
+    delete readings;
     plugin_ingest(handle, (READINGSET *)readingSet);
 
     vector<Reading *> results = outReadings->getAllReadings();
@@ -59,6 +62,10 @@ TEST(OMFHINT, OmfHintDisabled)
 
     vector<Datapoint *> points = out->getReadingData();
     ASSERT_EQ(points.size(), 1);
+
+    delete config;
+    delete outReadings;
+    plugin_shutdown(handle);
 }
 
 TEST(OMFHINT, OmfHintAddAssetDataPointHint)
@@ -82,6 +89,8 @@ TEST(OMFHINT, OmfHintAddAssetDataPointHint)
     readings->push_back(in);
 
     ReadingSet *readingSet = new ReadingSet(readings);
+    readings->clear();
+    delete readings;
     plugin_ingest(handle, (READINGSET *)readingSet);
 
     vector<Reading *> results = outReadings->getAllReadings();
@@ -97,6 +106,10 @@ TEST(OMFHINT, OmfHintAddAssetDataPointHint)
     
     outdp = points[1];
     ASSERT_STREQ(outdp->getName().c_str(), "OMFHint");
+
+    delete config;
+    delete outReadings;
+    plugin_shutdown(handle);
 }
 
 TEST(OMFHINT, OmfHintDatapointMacro)
@@ -151,6 +164,8 @@ TEST(OMFHINT, OmfHintDatapointMacro)
     readings->push_back(in);
 
     ReadingSet *readingSet = new ReadingSet(readings);
+    readings->clear();
+    delete readings;
     plugin_ingest(handle, (READINGSET *)readingSet);
 
     vector<Reading *> results = outReadings->getAllReadings();
@@ -176,6 +191,10 @@ TEST(OMFHINT, OmfHintDatapointMacro)
     outdp = points[4];
     ASSERT_STREQ(outdp->getName().c_str(),"OMFHint");
     ASSERT_STREQ(outdp->getData().toString().c_str(), "\"{\\\"datapoint\\\":[{\\\"name\\\":\\\"voltage\\\",\\\"number\\\":\\\"float32\\\",\\\"uom\\\":\\\"Volt\\\"},{\\\"name\\\":\\\"current\\\",\\\"number\\\":\\\"uint32\\\",\\\"uom\\\":\\\"Ampere\\\"}]}\"");
+
+    delete config;
+    delete outReadings;
+    plugin_shutdown(handle);
 }
 
 // Testing for ASSET macro
@@ -213,6 +232,8 @@ TEST(OMFHINT, OmfHintASSETMacro)
     readings->push_back(in);
 
     ReadingSet *readingSet = new ReadingSet(readings);
+    readings->clear();
+    delete readings;
     plugin_ingest(handle, (READINGSET *)readingSet);
 
     vector<Reading *> results = outReadings->getAllReadings();
@@ -236,6 +257,10 @@ TEST(OMFHINT, OmfHintASSETMacro)
     outdp = points[3];
     ASSERT_STREQ(outdp->getName().c_str(), "OMFHint");
     ASSERT_STREQ(outdp->getData().toString().c_str(),   "\"{\\\"AFLocation\\\":\\\"/UK/London/Plant1/12/Camera\\\"}\"");
+
+    delete config;
+    delete outReadings;
+    plugin_shutdown(handle);
 }
 
 // Testing for missing datapoint city
@@ -269,6 +294,8 @@ TEST(OMFHINT, OmfHintASSETMacroMissingDataPoints)
     readings->push_back(in);
 
     ReadingSet *readingSet = new ReadingSet(readings);
+    readings->clear();
+    delete readings;
     plugin_ingest(handle, (READINGSET *)readingSet);
 
     vector<Reading *> results = outReadings->getAllReadings();
@@ -289,6 +316,10 @@ TEST(OMFHINT, OmfHintASSETMacroMissingDataPoints)
     ASSERT_STREQ(outdp->getName().c_str(), "OMFHint");
     // Except missing datapoint city other macros have been replaced.
     ASSERT_STREQ(outdp->getData().toString().c_str(),  "\"{\\\"AFLocation\\\":\\\"/UK/$city$/Plant1/12/Camera\\\"}\"");
+
+    delete config;
+    delete outReadings;
+    plugin_shutdown(handle);
 }
 
 
@@ -327,6 +358,8 @@ TEST(OMFHINT, OmfHintPermutationMacro)
     readings->push_back(in);
 
     ReadingSet *readingSet = new ReadingSet(readings);
+    readings->clear();
+    delete readings;
     plugin_ingest(handle, (READINGSET *)readingSet);
 
     vector<Reading *> results = outReadings->getAllReadings();
@@ -350,6 +383,10 @@ TEST(OMFHINT, OmfHintPermutationMacro)
     outdp = points[3];
     ASSERT_STREQ(outdp->getName().c_str(), "OMFHint");
     ASSERT_STREQ(outdp->getData().toString().c_str(),  "\"{\\\"AFLocation\\\":\\\"/UK/NorthLondonPlant1South/A12B/Camera\\\"}\"");
+
+    delete config;
+    delete outReadings;
+    plugin_shutdown(handle);
 }
 
 // Testing for unpaired $ sign
@@ -387,6 +424,8 @@ TEST(OMFHINT, OmfHintPermutationMacro2)
     readings->push_back(in);
 
     ReadingSet *readingSet = new ReadingSet(readings);
+    readings->clear();
+    delete readings;
     plugin_ingest(handle, (READINGSET *)readingSet);
 
     vector<Reading *> results = outReadings->getAllReadings();
@@ -410,6 +449,10 @@ TEST(OMFHINT, OmfHintPermutationMacro2)
     outdp = points[3];
     ASSERT_STREQ(outdp->getName().c_str(), "OMFHint");
     ASSERT_STREQ(outdp->getData().toString().c_str(),  "\"{\\\"AFLocation\\\":\\\"/UK/LondonPlant1/12ASSET$\\\"}\"");
+
+    delete config;
+    delete outReadings;
+    plugin_shutdown(handle);
 }
 
 // Testing for ASSET macro
@@ -447,6 +490,8 @@ TEST(OMFHINT, OmfHintCaseSensitivityMacro)
     readings->push_back(in);
 
     ReadingSet *readingSet = new ReadingSet(readings);
+    readings->clear();
+    delete readings;
     plugin_ingest(handle, (READINGSET *)readingSet);
 
     vector<Reading *> results = outReadings->getAllReadings();
@@ -470,6 +515,10 @@ TEST(OMFHINT, OmfHintCaseSensitivityMacro)
     outdp = points[3];
     ASSERT_STREQ(outdp->getName().c_str(), "OMFHint");
     ASSERT_STREQ(outdp->getData().toString().c_str(),  "\"{\\\"AFLocation\\\":\\\"/UK/London/$Factory$/$Floor$/Camera\\\"}\"");
+
+    delete config;
+    delete outReadings;
+    plugin_shutdown(handle);
 }
 
 // Testing macro for unsupported datatype for city datapoint
@@ -494,6 +543,7 @@ TEST(OMFHINT, OmfHintUnspportedMacro)
     //unsupported DatapointValue::dataTagType::T_IMAGE datatype
     void *data = malloc(100 * 100);
     DPImage *cityImage = new DPImage(100, 100, 8, data);
+    free(data);
     
     DatapointValue cityDpv(cityImage);
     dpValue.push_back(new Datapoint("city", cityDpv));
@@ -510,6 +560,8 @@ TEST(OMFHINT, OmfHintUnspportedMacro)
     readings->push_back(in);
 
     ReadingSet *readingSet = new ReadingSet(readings);
+    readings->clear();
+    delete readings;
     plugin_ingest(handle, (READINGSET *)readingSet);
 
     vector<Reading *> results = outReadings->getAllReadings();
@@ -534,4 +586,8 @@ TEST(OMFHINT, OmfHintUnspportedMacro)
     ASSERT_STREQ(outdp->getName().c_str(), "OMFHint");
     // Except unsupported datapoint city of image type other macros have been replaced.
     ASSERT_STREQ(outdp->getData().toString().c_str(),  "\"{\\\"AFLocation\\\":\\\"/UK/$city$/Plant1/12/Camera\\\"}\"");
+
+    delete config;
+    delete outReadings;
+    plugin_shutdown(handle);
 }
