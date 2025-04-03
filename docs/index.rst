@@ -46,7 +46,9 @@ The following hint types are currently supported by |OMFNorth|:
 
   - *typeName*: Specify a particular type name that should be used by the plugin when it generates a type for the asset. The value of the hint is the name of the type to create.
 
-  - *tagName*: Specify a particular tag name that should be used by the plugin when it generates a tag for the asset. The value of the hint is the name of the tag to create.
+  - *tagName*: The tagName hint can specify the names of two different items depending on where the hint is placed.
+    The tagName hint can be used to rename an asset, or specify the name of a PI Point that maps a datapoint.
+    See the `Tag Name Hint`_ section below.
 
   - *type*: Specify a pre-existing type that should be used for the asset. In this case the value of the hint is the type to use. The type must already exist within your PI Server and must be compatible with the values within the asset.
 
@@ -103,7 +105,7 @@ To apply a hint to a particular data point the hint would be as follows
     "supply": {
         "datapoint" :
             {
-                "name": "frequency"
+                "name": "frequency",
                 "integer": "uint16"
             }
         }
@@ -120,7 +122,7 @@ Datapoint hints can be combined with asset hints
         "number" : "float32",
         "datapoint" :
             {
-                "name": "frequency"
+                "name": "frequency",
                 "integer": "uint16"
             }
         }
@@ -154,6 +156,124 @@ The example above attaches a number hint to both the voltage and current
 datapoints and to the current datapoint. It assigns a unit of measure
 of milliampere. The unit of measure for the voltage is set to be volts.
 
+Tag Name Hint
+~~~~~~~~~~~~~
+
+The Tag Name OMF Hint can be use to specify two different items in OMF:
+
+- the hint can be used to specify the name of an OMF Container which becomes an AF Element in the target AF Database, or
+- the hint can be used to specify the name of a PI Point that maps a datapoint in a reading.
+
+The *tagName* keyword is the same in both cases.
+The keyword is specified in two different places in the configuration JSON document.
+
+Tag Name OMF Hint to Specify a Container
+########################################
+
+The default name of an OMF Container is the reading's asset name.
+To override this default and specify an OMF Container name instead, use this JSON syntax:
+
+.. code-block:: JSON
+
+    {
+        "reactor6": {
+            "tagName":"Oakland Reactor 6"
+        }
+    }
+
+New OMF Container names for multiple assets can be specified in a single JSON configuration:
+
+.. code-block:: JSON
+
+    {
+        "reactor6": {
+            "tagName":"Oakland Reactor 6"
+        },
+        "tank11": {
+            "tagName":"Tank 11 Jet Fuel"
+        }
+    }
+
+Tag Name OMF Hint to Specify a PI Point Name
+############################################
+
+The default name of a datapoint's PI Point is the reading's asset name concatenated with the datapoint name, separated by a dot (".").
+To override this default and specify a PI Point name instead, use this JSON syntax:
+
+.. code-block:: JSON
+
+    {
+      "motor4":{
+           "datapoint": {
+               "name":"rpm",
+               "tagName":"M4-RPM.PV"
+            }
+         },
+       "tank11": {
+           "datapoint": {
+               "name":"level",
+               "tagName":"T11-LVL.PV"
+            }
+         }
+    }
+
+The example shows the definition of one datapoint for each of two assets.
+To specify the PI Point names for more than one datapoint in an asset, use a JSON array of *datapoints*:
+
+.. code-block:: JSON
+
+    {
+       "reactor6": {
+          "datapoint": [
+             {
+                "name":"temperature",
+                "tagName":"R6TEMP.PV"
+             },
+             {
+                "name":"pressure",
+                "tagName":"R6PRESS.PV"
+             }
+          ]
+       }
+    }
+
+Tag Name OMF Hint for Both Container and PI Point
+#################################################
+
+It is possible to specify new names for the OMF Container and new PI Point names for datapoints in the same configuration.
+You can specify multiple name overrides for both.
+For example:
+
+.. code-block:: JSON
+
+    {
+       "reactor6": {
+          "tagName":"Oakland Reactor 6",
+          "datapoint": [
+             {
+                "name":"temperature",
+                "tagName":"R6TEMP.PV"
+             },
+             {
+                "name":"pressure",
+                "tagName":"R6PRESS.PV"
+             }
+          ]
+       },
+       "tank11": {
+          "tagName":"Tank 11 Jet Fuel",
+          "datapoint": [
+             {
+                "name":"level",
+                "tagName":"T11-LVL.PV"
+             },
+             {
+                "name":"temperature",
+                "tagName":"T11-TMP.PV"
+             }
+          ]
+       }
+    }
 
 Macro substitution
 ------------------
