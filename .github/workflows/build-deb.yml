@@ -25,6 +25,5 @@ jobs:
     with:
       package: fledge-filter-omfhint
       kind: cpp
-      exclude-codenames: bullseye
       core-run-id: ${{ inputs.core-run-id }}
     secrets: inherit
