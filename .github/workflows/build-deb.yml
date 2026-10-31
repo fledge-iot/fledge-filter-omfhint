@@ -11,6 +11,18 @@ on:
       core-run-id:
         type: string
         default: ""
+      targets:
+        description: "Only build these codename/arch targets, e.g. 'focal/amd64 bullseye/armhf'"
+        type: string
+        default: ""
+      release-tag:
+        description: "Build an rc version outside a release event, e.g. v3.1.0-rc.1"
+        type: string
+        default: ""
+      fledge-ref:
+        description: "fledge ref for headers and packaging scripts (match the core you build against, e.g. v3.1.1)"
+        type: string
+        default: develop
 
 permissions:
   contents: read
@@ -26,4 +38,7 @@ jobs:
       package: fledge-filter-omfhint
       kind: cpp
       core-run-id: ${{ inputs.core-run-id }}
+      targets: ${{ inputs.targets }}
+      release-tag: ${{ inputs.release-tag }}
+      fledge-ref: ${{ inputs.fledge-ref || 'develop' }}
     secrets: inherit
